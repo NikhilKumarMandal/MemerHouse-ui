@@ -14,63 +14,54 @@ import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Credentials } from "@/Types/types";
-import { login } from "@/http/api";
-import { useState } from "react";
-import { toast } from "sonner"
+import {  register } from "@/http/api";
+
 
 
 // Define the validation schema using Zod
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  password: z
+const RegisterSchema = z.object({
+    email: z.string().email("Please enter a valid email address."),
+    username: z.string().min(2,"username atleast 2 characters long"),
+    password: z
     .string()
     .min(6, "Password must be at least 6 characters long.")
     .nonempty("Password is required."),
 });
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof RegisterSchema>;
 
-const loginUser = async (credentials: Credentials) => {
-  const { data } = await login(credentials);
+const registerForm = async (credentials: Credentials) => {
+  const { data } = await register(credentials);
   return data;
 };
 
-export default function LoginPage() {
-  // State for handling server errors
-  const [serverError, setServerError] = useState<string | null>(null);
+function RegisterPage() {
+
 
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(RegisterSchema),
   });
 
   const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
-    mutationFn: loginUser,
+    mutationFn: registerForm,
     onSuccess: () => {
-      toast("Logged In successfully")
-      setServerError(null); // Clear any previous errors
+      console.log("User logged in successfully");
     },
-      onError: (error: any) => {
-        console.log(error?.response);
-        
-      // Handle backend error response
-      setServerError(error?.response?.data?.message || "Something went wrong");
-    },
+
   });
 
   // Handle form submission
-  const onSubmit = (data: LoginFormValues) => {
-    setServerError(null); // Clear previous errors
+  const onSubmit = (data: RegisterFormValues) => {
     mutate(data);
     console.log("Form Data:", data);
   };
-
   return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
+        <div className="flex h-screen w-full items-center justify-center px-4">
       <Card className="mx-auto max-w-sm">
         {/* Card Header */}
         <CardHeader>
@@ -95,6 +86,21 @@ export default function LoginPage() {
               />
               {errors.email && (
                 <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
+                </div>
+                      
+              {/* username Field */}
+            <div className="grid gap-2">
+              <Label htmlFor="email">Username</Label>
+              <Input
+                id="username"
+                type="username"
+                placeholder="username"
+                {...register("username")}
+                className={errors.email ? "border-red-500" : ""}
+              />
+              {errors.username && (
+                <p className="text-sm text-red-500">{errors.username.message}</p>
               )}
             </div>
 
@@ -124,13 +130,20 @@ export default function LoginPage() {
             </div>
 
             {/* Server Error Display */}
-            {serverError && (
-              <p className="text-sm text-center text-red-500">{serverError}</p>
+            {errors.root && (
+              <p className="text-sm text-center text-red-500">{errors.root.message}</p>
             )}
 
             {/* Login Button */}
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Logging in..." : "Login"}
+           <Button type="submit" className="w-full flex justify-center items-center gap-2" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
+                  Registering...
+                </>
+              ) : (
+                "Register"
+              )}
             </Button>
 
             {/* Google Login Button */}
@@ -149,8 +162,7 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
-
-
+export default RegisterPage
