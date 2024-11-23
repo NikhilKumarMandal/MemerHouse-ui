@@ -1,76 +1,154 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { Credentials } from "@/Types/types";
+import { login } from "@/http/api";
+import { useState } from "react";
 
-function LoginPage() {
-  // Initialize useForm
-  const form = useForm({
-    defaultValues: {
-      username: "",
+// Define the validation schema using Zod
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address."),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long.")
+    .nonempty("Password is required."),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+const loginUser = async (credentials: Credentials) => {
+  const { data } = await login(credentials);
+  return data;
+};
+
+export default function LoginPage() {
+  // State for handling server errors
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: loginUser,
+    onSuccess: () => {
+      console.log("User logged in successfully");
+      setServerError(null); // Clear any previous errors
+    },
+      onError: (error: any) => {
+        console.log(error?.response);
+        
+      // Handle backend error response
+      setServerError(error?.response?.data?.message || "Something went wrong");
     },
   });
 
+  // Handle form submission
+  const onSubmit = (data: LoginFormValues) => {
+    setServerError(null); // Clear previous errors
+    mutate(data);
+    console.log("Form Data:", data);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-md bg-white p-6 shadow-md rounded-lg">
-        {/* Provide form context */}
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => console.log(data))}
-            className="space-y-6"
-          >
-            <FormField
-              name="username"
-              control={form.control} // Provide control from useForm
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-lg font-medium text-gray-700">
-                    Username
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="shadcn"
-                      {...field}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                    </FormControl>
-                    <FormLabel className="text-lg font-medium text-gray-700">
-                    Password
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="shadcn"
-                      {...field}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    />
-                  </FormControl>
-                  <FormDescription className="text-sm text-gray-500">
-                    This is your public display name.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
+    <div className="flex h-screen w-full items-center justify-center px-4">
+      <Card className="mx-auto max-w-sm">
+        {/* Card Header */}
+        <CardHeader>
+          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardDescription>
+            Enter your email below to log in to your account.
+          </CardDescription>
+        </CardHeader>
+
+        {/* Card Content */}
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            {/* Email Field */}
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                {...register("email")}
+                className={errors.email ? "border-red-500" : ""}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
               )}
-            />
-            <Button
-              type="submit"
-              className="w-full bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500"
-            >
-              Login
+            </div>
+
+            {/* Password Field */}
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="ml-auto inline-block text-sm underline"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                {...register("password")}
+                className={errors.password ? "border-red-500" : ""}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            {/* Server Error Display */}
+            {serverError && (
+              <p className="text-sm text-center text-red-500">{serverError}</p>
+            )}
+
+            {/* Login Button */}
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Logging in..." : "Login"}
+            </Button>
+
+            {/* Google Login Button */}
+            <Button variant="outline" className="w-full">
+              Login with Google
             </Button>
           </form>
-        </Form>
-      </div>
+
+          {/* Sign-up Link */}
+          <div className="mt-4 text-center text-sm">
+            Don&apos;t have an account?{" "}
+            <Link to="/signup" className="underline">
+              Sign up
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-export default LoginPage;
+
+
