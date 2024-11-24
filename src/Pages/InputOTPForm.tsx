@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useParams } from "react-router-dom"; // Import useParams
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,10 +30,22 @@ const FormSchema = z.object({
 
 // API call function
 const verifyEmail = async ({ id, otp }: { id: string; otp: string }) => {
-  return await verifyEmailOtp(id, otp);
+  return await verifyEmailOtp(id, { otp });
 };
 
 function InputOTPForm() {
+  // Extracting the user ID from the route parameters
+  const { id } = useParams<{ id: string }>();
+
+  if (!id) {
+    toast({
+      title: "Error",
+      description: "User ID is missing. Please ensure you are accessing the correct route.",
+      variant: "destructive",
+    });
+    return null; // Early return if `id` is not available
+  }
+
   // Form setup
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -61,7 +74,7 @@ function InputOTPForm() {
 
   // Form submission
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    mutate(id,otp);
+    mutate({ id, otp: data.pin }); // Pass `pin` as the `otp` value
   };
 
   return (
@@ -109,6 +122,8 @@ function InputOTPForm() {
 }
 
 export default InputOTPForm;
+
+
 
 
 

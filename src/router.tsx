@@ -20,7 +20,8 @@ export const router = createBrowserRouter([
         element: <RegisterPage/>
     },
     {
-        path: "/verify-otp/:id",
-        element: <InputOTPForm/>
+    path: "/verify-otp/:id", 
+    element: <InputOTPForm />,
     }
+
 ])

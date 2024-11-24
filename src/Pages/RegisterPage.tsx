@@ -11,12 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Credentials } from "@/Types/types";
 import {  register } from "@/http/api";
-
-
 
 // Define the validation schema using Zod
 const RegisterSchema = z.object({
@@ -30,14 +28,16 @@ const RegisterSchema = z.object({
 
 type RegisterFormValues = z.infer<typeof RegisterSchema>;
 
-const registerForm = async (credentials: Credentials) => {
+const registerForm = async (credentials: Credentials)=> {
   const { data } = await register(credentials);
   return data;
 };
 
+
 function RegisterPage() {
 
-
+  const navigate = useNavigate();
+  
   const {
     handleSubmit,
     register,
@@ -46,14 +46,14 @@ function RegisterPage() {
     resolver: zodResolver(RegisterSchema),
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationKey: ["login"],
-    mutationFn: registerForm,
-    onSuccess: () => {
-      console.log("User logged in successfully");
-    },
-
-  });
+const { mutate, isPending } = useMutation({
+  mutationKey: ["register"],
+  mutationFn: registerForm,
+  onSuccess: (data) => {
+    console.log("User registered successfully:", data.data._id);
+    navigate(`/verify-otp/${data.data._id}`);
+  },
+});
 
   // Handle form submission
   const onSubmit = (data: RegisterFormValues) => {
