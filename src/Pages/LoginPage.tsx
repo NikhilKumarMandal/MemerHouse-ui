@@ -12,10 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "@/Types/types";
-import { login } from "@/http/api";
-import { useState } from "react";
+import { login, self } from "@/http/api";
 import { toast } from "sonner"
 
 
@@ -35,9 +34,12 @@ const loginUser = async (credentials: Credentials) => {
   return data;
 };
 
+const getSelf = async () => {
+  const { data } = await self();
+  return data
+}
+
 export default function LoginPage() {
-  // State for handling server errors
-  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     handleSubmit,
@@ -47,24 +49,24 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const { mutate, isPending } = useMutation({
+  const { data: selfData ,refetch} = useQuery({
+    queryKey: ["self"],
+    queryFn: getSelf,
+    enabled: false
+  })
+
+  const { mutate, isPending,isError } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
-    onSuccess: () => {
+    onSuccess: async () => {
+      refetch()
+      console.log("UserData",selfData);
       toast("Logged In successfully")
-      setServerError(null); // Clear any previous errors
-    },
-      onError: (error: any) => {
-        console.log(error?.response);
-        
-      // Handle backend error response
-      setServerError(error?.response?.data?.message || "Something went wrong");
-    },
+    }
   });
 
   // Handle form submission
   const onSubmit = (data: LoginFormValues) => {
-    setServerError(null); // Clear previous errors
     mutate(data);
     console.log("Form Data:", data);
   };
@@ -124,8 +126,8 @@ export default function LoginPage() {
             </div>
 
             {/* Server Error Display */}
-            {serverError && (
-              <p className="text-sm text-center text-red-500">{serverError}</p>
+            {errors.root && (
+              <p className="text-sm text-center text-red-500">{isError}</p>
             )}
 
             {/* Login Button */}

@@ -1,9 +1,8 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
- 
-import { toast } from "@/hooks/use-toast"
-import { Button } from "@/components/ui/button"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,42 +11,65 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from "@/components/ui/input-otp";
+import { useMutation } from "@tanstack/react-query";
+import { verifyEmailOtp } from "@/http/api";
+
 // Schema for validating OTP
 const FormSchema = z.object({
-  pin: z.string().min(6, {
-    message: "Your one-time password must be 6 characters.",
-  }),
-})
+  pin: z
+    .string()
+    .length(4, { message: "Your one-time password must be exactly 4 characters." }),
+});
+
+// API call function
+const verifyEmail = async ({ id, otp }: { id: string; otp: string }) => {
+  return await verifyEmailOtp(id, otp);
+};
 
 function InputOTPForm() {
+  // Form setup
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      pin: "",
-    },
-  })
+    defaultValues: { pin: "" },
+  });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
-  }
+  // Mutation for OTP verification
+  const { mutate, isPending } = useMutation({
+    mutationKey: ["verify-otp"],
+    mutationFn: verifyEmail,
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Your email has been verified successfully!",
+      });
+      form.reset(); // Reset form on success
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Verification failed. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Form submission
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    mutate(id,otp);
+  };
 
   return (
- <div className="flex items-center justify-center min-h-screen bg-background w-full">
+    <div className="flex items-center justify-center min-h-screen bg-background w-full">
       <div className="w-full max-w-md p-8 bg-card rounded-lg shadow-lg mx-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center text-foreground">Enter OTP</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-foreground">
+          Enter OTP
+        </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -55,35 +77,38 @@ function InputOTPForm() {
               name="pin"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-center block">One-Time Password</FormLabel>
+                  <FormLabel className="text-center block">
+                    One-Time Password
+                  </FormLabel>
                   <FormControl>
                     <div className="flex justify-center">
-                      <InputOTP maxLength={6} {...field}>
+                      <InputOTP maxLength={4} {...field}>
                         <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
+                          {[...Array(4)].map((_, index) => (
+                            <InputOTPSlot key={index} index={index} />
+                          ))}
                         </InputOTPGroup>
                       </InputOTP>
                     </div>
                   </FormControl>
                   <FormDescription className="text-center">
-                    Please enter the one-time password sent to your phone.
+                    Please enter the one-time password sent to your email.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">Submit</Button>
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Submitting..." : "Submit"}
+            </Button>
           </form>
         </Form>
       </div>
     </div>
-  )
+  );
 }
 
-export default InputOTPForm
+export default InputOTPForm;
+
+
 
