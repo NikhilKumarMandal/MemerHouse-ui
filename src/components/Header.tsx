@@ -28,12 +28,12 @@ function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                <Link to="/profile">
-                <DropdownMenuItem >
-                <User className="mr-2 h-4 w-4" />           
-                  Profile
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
                 </DropdownMenuItem>
-                </Link>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600">
                   <LogOut className="mr-2 h-4 w-4" />

@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
     element: <InputOTPForm />,
     },
     {
-    path: "/vprofile", 
+    path: "/profile", 
     element: <ProfilePage/>,
     }
 
