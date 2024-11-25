@@ -16,6 +16,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Credentials } from "@/Types/types";
 import { login, self } from "@/http/api";
 import { toast } from "sonner"
+import { useAuthStore } from "@/store";
 
 
 // Define the validation schema using Zod
@@ -40,7 +41,7 @@ const getSelf = async () => {
 }
 
 export default function LoginPage() {
-
+  const {setUser} = useAuthStore()
   const {
     handleSubmit,
     register,
@@ -59,8 +60,8 @@ export default function LoginPage() {
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {
-      refetch()
-      console.log("UserData",selfData);
+      const selfDataPromise = await refetch();
+      setUser(selfDataPromise.data.data)
       toast("Logged In successfully")
     }
   });
@@ -68,7 +69,6 @@ export default function LoginPage() {
   // Handle form submission
   const onSubmit = (data: LoginFormValues) => {
     mutate(data);
-    console.log("Form Data:", data);
   };
 
   return (
