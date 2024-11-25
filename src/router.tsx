@@ -3,7 +3,7 @@ import HomePage from "./Pages/HomePage";
 import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import InputOTPForm from "./Pages/InputOTPForm";
-import Page from "./Pages/Page";
+import ProfilePage from "./Pages/ProfilePage";
 
 
 
@@ -24,9 +24,9 @@ export const router = createBrowserRouter([
     path: "/verify-otp/:id", 
     element: <InputOTPForm />,
     },
-        {
-    path: "/page", 
-    element: <Page/>
+    {
+    path: "/vprofile", 
+    element: <ProfilePage/>,
     }
 
 ])
