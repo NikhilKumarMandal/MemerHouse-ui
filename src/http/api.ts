@@ -7,4 +7,6 @@ export const self = () => api.get("/users/current-user");
 
 export const register = (credentials: Credentials) => api.post("/users/register", credentials)
 
+export const logout = () => api.post("/users/logout")
+
 export const verifyEmailOtp = (id: string, otp: string) => api.post(`/users/verify-email/${id}`, otp);

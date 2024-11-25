@@ -4,29 +4,53 @@ import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import InputOTPForm from "./Pages/InputOTPForm";
 import ProfilePage from "./Pages/ProfilePage";
+import Dhashboard from "./Layouts/Dhashboard";
+import NonAuth from "./Layouts/NonAuth";
+import Root from "./Layouts/Root";
 
 
 
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <HomePage/>
+        element: <Root />,
+        children: [
+    {
+        path: "",
+        element: <Dhashboard />,
+        children: [
+        {
+            path: "",
+            element: <HomePage/>
+        },
+        {
+            path: "/profile", 
+            element: <ProfilePage/>,
+        }
+        ]
     },
     {
-        path: "/login",
+        path: "/auth",
+        element: <NonAuth />,
+        children: [
+        {
+        path: "login",
         element: <LoginPage/>
-    },
-    {
-        path: "/register",
+        },
+        {
+        path: "register",
         element: <RegisterPage/>
+        },
+        {
+        path: "verify-otp/:id", 
+        element: <InputOTPForm />,
+        },
+    ]
     },
-    {
-    path: "/verify-otp/:id", 
-    element: <InputOTPForm />,
+    ]
     },
-    {
-    path: "/profile", 
-    element: <ProfilePage/>,
-    }
+
+
+
 
 ])

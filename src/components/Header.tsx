@@ -8,8 +8,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Link } from 'react-router-dom'
+import { useAuthStore } from '@/store'
+import { logout } from '@/http/api'
+import { useMutation } from '@tanstack/react-query'
 
 function Header() {
+    const { logout: logoutUserFromStore } = useAuthStore();
+
+    const { mutate: logoutMutate } = useMutation({
+    mutationKey: ["logout"],
+    mutationFn: logout,
+    onSuccess: async () => {
+    logoutUserFromStore();
+    return;
+    }
+    })
+    const handleLogout = () => {
+    logoutMutate();
+    };
   return (
     <header className="border-b border-zinc-800 bg-zinc-950">
       <div className="container mx-auto px-4">
@@ -35,7 +51,10 @@ function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
+                  onClick={handleLogout} 
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
