@@ -62,9 +62,8 @@ export default function LoginPage() {
     mutationKey: ["login"],
     mutationFn: loginUser,
     onSuccess: async () => {  
-       await refetch();
-      const user = selfData.data;
-      setUser(user)
+      const selfDataPromise = await refetch(); 
+      setUser(selfDataPromise.data)
       toast("Logged In successfully")
       navigate("/")
     },

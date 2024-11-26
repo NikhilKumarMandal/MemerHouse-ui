@@ -8,20 +8,14 @@ const getAll = async () => {
   return response.data.data; 
 };
 
-
-
 function RoomGrid() {
-  const { data: rooms, isLoading, error } = useQuery({
+  const { data: rooms, isLoading } = useQuery({
     queryKey: ["getrooms"],
     queryFn: getAll,
   });
 
   if (isLoading) {
     return <RoomGridSkeleton />;
-  }
-
-  if (error) {
-    return <p>Error loading rooms: {error.message}</p>;
   }
 
   if (!Array.isArray(rooms)) {

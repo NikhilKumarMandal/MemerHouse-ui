@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,6 +11,7 @@ import { useAuthStore } from "@/store";
 import { Room } from "@/Types/types";
 import { createRoom } from "@/http/api";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 
 const formSchema = z.object({
@@ -34,6 +35,7 @@ const roomFrom = async (room: Room) => {
 
 function CreateRoomModal({ open, onOpenChange, onCreateRoom }: CreateRoomModalProps) {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
 
   const { control, handleSubmit, formState: { errors }, reset, setError } = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -41,11 +43,12 @@ function CreateRoomModal({ open, onOpenChange, onCreateRoom }: CreateRoomModalPr
   });
 
   useEffect(() => {
-    if (user?.data?._id) {
-      reset({ owner: user.data._id, topic: "", roomType: "open" });
+    if (user?._id) {
+      reset({ owner: user._id, topic: "", roomType: "open" });
     }
   }, [user, reset]);
 
+  const roomId = '1223'
   const { mutate } = useMutation({
     mutationKey: ["room"],
     mutationFn: roomFrom,
@@ -53,6 +56,7 @@ function CreateRoomModal({ open, onOpenChange, onCreateRoom }: CreateRoomModalPr
       console.log("Room created successfully:", data);
       reset();
       onOpenChange(false);
+      navigate(`/room/${data.data._id}`)
     },
     onError: (error: any) => {
       const errorMessage = error?.response?.data?.message || "An unexpected error occurred.";

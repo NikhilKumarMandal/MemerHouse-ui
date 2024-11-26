@@ -51,7 +51,6 @@ const { mutate, isPending } = useMutation({
   mutationKey: ["register"],
   mutationFn: registerForm,
   onSuccess: (data) => {
-    console.log("User registered successfully:", data.data._id);
     navigate(`/auth/verify-otp/${data.data._id}`);
   },
   onError: (error: any) => {

@@ -7,6 +7,7 @@ import ProfilePage from "./Pages/ProfilePage";
 import Dhashboard from "./Layouts/Dhashboard";
 import NonAuth from "./Layouts/NonAuth";
 import Root from "./Layouts/Root";
+import Room from "./Pages/Room";
 
 
 
@@ -26,6 +27,10 @@ export const router = createBrowserRouter([
         {
             path: "/profile", 
             element: <ProfilePage/>,
+        },
+        {
+            path: "/room/:id",
+            element: <Room/>
         }
         ]
     },
