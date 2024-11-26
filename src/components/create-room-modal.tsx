@@ -122,7 +122,6 @@ function CreateRoomModal({ open, onOpenChange, onCreateRoom }: CreateRoomModalPr
               <Button
                 type="submit"
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
-                disabled={isLoading}
               >
                 <Mic className="mr-2 h-5 w-5" />
                 Let&apos;s go

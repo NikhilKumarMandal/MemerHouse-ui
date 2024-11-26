@@ -11,5 +11,6 @@ export const logout = () => api.post("/users/logout")
 
 export const verifyEmailOtp = (id: string, otp: string) => api.post(`/users/verify-email/${id}`, otp);
 
-
 export const createRoom = (data: Room) => api.post("/room/createRoom", data);
+
+export const getAllRooms = () => api.get("/room/rooms");

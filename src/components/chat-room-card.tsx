@@ -7,7 +7,7 @@ interface ChatRoomCardProps {
   participants: {
     name: string
     avatar: string
-  }[]
+  }[] 
   totalParticipants: number
 }
 
@@ -25,22 +25,30 @@ function ChatRoomCard({
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="flex -space-x-2">
-              {participants.slice(0, 2).map((participant, index) => (
-                <Avatar key={index} className="border-2 border-background">
-                  <AvatarImage src={participant.avatar} alt={participant.name} />
-                  <AvatarFallback>
-                    {participant.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
+              {participants.slice(0, 2).map((participant, index) => {
+                const { name, avatar } = participant;
+                // Use default fallback if avatar is not available
+                const avatarSrc = avatar || "/path/to/default-avatar.png";
+                const initials = name ? name.split(' ').map(n => n[0]).join('') : "NA";
+
+                return (
+                  <Avatar key={index} className="border-2 border-background">
+                    <AvatarImage src={avatarSrc} alt={name} />
+                    <AvatarFallback>{initials}</AvatarFallback>
+                  </Avatar>
+                );
+              })}
             </div>
             <div className="flex flex-col gap-1">
-              {participants.slice(0, 2).map((participant, index) => (
-                <div key={index} className="flex items-center gap-1">
-                  <span className="text-sm">{participant.name}</span>
-                  <span className="text-xs">💬</span>
-                </div>
-              ))}
+              {participants.slice(0, 2).map((participant, index) => {
+                const { name } = participant;
+                return (
+                  <div key={index} className="flex items-center gap-1">
+                    <span className="text-sm">{name || "Unnamed Participant"}</span>
+                    <span className="text-xs">💬</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
@@ -53,4 +61,4 @@ function ChatRoomCard({
   )
 }
 
-export default ChatRoomCard
+export default ChatRoomCard;
