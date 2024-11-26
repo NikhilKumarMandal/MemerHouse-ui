@@ -1,4 +1,4 @@
-import { Credentials } from "@/Types/types";
+import { Credentials, Room } from "@/Types/types";
 import { api } from "./client";
 
 export const login = (credentials: Credentials) => api.post("/users/login", credentials);
@@ -10,3 +10,6 @@ export const register = (credentials: Credentials) => api.post("/users/register"
 export const logout = () => api.post("/users/logout")
 
 export const verifyEmailOtp = (id: string, otp: string) => api.post(`/users/verify-email/${id}`, otp);
+
+
+export const createRoom = (data: Room) => api.post("/room/createRoom", data);

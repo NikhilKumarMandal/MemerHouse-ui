@@ -42,6 +42,7 @@ function RegisterPage() {
     handleSubmit,
     register,
     formState: { errors },
+    setError
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(RegisterSchema),
   });
@@ -51,8 +52,14 @@ const { mutate, isPending } = useMutation({
   mutationFn: registerForm,
   onSuccess: (data) => {
     console.log("User registered successfully:", data.data._id);
-    navigate(`/verify-otp/${data.data._id}`);
+    navigate(`/auth/verify-otp/${data.data._id}`);
   },
+  onError: (error: any) => {
+    // Assuming `error.response.data.message` contains the server error message
+    const errorMessage =
+        error?.response?.data?.message || "An unexpected error occurred.";
+    setError("root", { type: "server", message: errorMessage });
+    },
 });
 
   // Handle form submission

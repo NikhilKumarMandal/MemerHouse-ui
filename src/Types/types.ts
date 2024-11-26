@@ -3,3 +3,10 @@ export interface Credentials {
     password: string,
     username?: string
 }
+
+
+export interface Room {
+    topic: string,
+    roomType: string,
+    owner?: string
+}

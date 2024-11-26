@@ -46,6 +46,7 @@ export default function LoginPage() {
   const {
     handleSubmit,
     register,
+    setError,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -57,19 +58,28 @@ export default function LoginPage() {
     enabled: false
   })
 
-  const { mutate, isPending,isError } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
     mutationFn: loginUser,
-    onSuccess: async () => {
-      const selfDataPromise = await refetch();
-      setUser(selfDataPromise.data.data)
+    onSuccess: async () => {  
+       await refetch();
+      const user = selfData.data;
+      setUser(user)
       toast("Logged In successfully")
       navigate("/")
-    }
+    },
+    onError: (error: any) => {
+    // Assuming `error.response.data.message` contains the server error message
+    const errorMessage =
+        error?.response?.data?.message || "An unexpected error occurred.";
+    setError("root", { type: "server", message: errorMessage });
+    },
   });
 
   // Handle form submission
   const onSubmit = (data: LoginFormValues) => {
+    console.log("Data",data);
+    
     mutate(data);
   };
 
@@ -129,7 +139,7 @@ export default function LoginPage() {
 
             {/* Server Error Display */}
             {errors.root && (
-              <p className="text-sm text-center text-red-500">{isError}</p>
+              <p className="text-sm text-center text-red-500">{errors.root.message}</p>
             )}
 
             {/* Login Button */}
@@ -146,7 +156,7 @@ export default function LoginPage() {
           {/* Sign-up Link */}
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <Link to="/signup" className="underline">
+            <Link to="/auth/register" className="underline">
               Sign up
             </Link>
           </div>

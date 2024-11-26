@@ -12,9 +12,11 @@ import { useAuthStore } from '@/store'
 import { logout } from '@/http/api'
 import { useMutation } from '@tanstack/react-query'
 
-function Header() {
-    const { logout: logoutUserFromStore } = useAuthStore();
 
+
+function Header() {
+  const { logout: logoutUserFromStore, user } = useAuthStore();
+    
     const { mutate: logoutMutate } = useMutation({
     mutationKey: ["logout"],
     mutationFn: logout,
@@ -35,7 +37,7 @@ function Header() {
             <span className="text-xl font-semibold text-white">Memerhouse</span>
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-zinc-400">Rakesh K</span>
+            <span className="text-sm text-zinc-400">{ user?.data.username }</span>
             <DropdownMenu>
               <DropdownMenuTrigger className="focus-visible:outline-none">
                 <Avatar className="h-8 w-8">
