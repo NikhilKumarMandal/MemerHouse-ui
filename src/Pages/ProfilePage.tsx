@@ -4,10 +4,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useAuthStore } from "@/store"
 
 function ProfilePage() {
-    const [fullName, setFullName] = useState("Rakesh K")
+  const [fullName, setFullName] = useState("Rakesh K")
   const [avatar, setAvatar] = useState("/placeholder.svg")
+  const { user } = useAuthStore()
 
   const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFullName(e.target.value)
@@ -18,7 +20,7 @@ function ProfilePage() {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        setAvatar(reader.result as string)
+        setAvatar(reader.result as string) // Set base64 string as the avatar
       }
       reader.readAsDataURL(file)
     }
@@ -29,6 +31,7 @@ function ProfilePage() {
     // Here you would typically send the updated data to your backend
     console.log("Profile updated:", { fullName, avatar })
   }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="max-w-2xl mx-auto">
@@ -39,8 +42,10 @@ function ProfilePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col items-center space-y-4">
               <Avatar className="w-32 h-32">
-                <AvatarImage src={avatar} alt="Profile picture" />
-                <AvatarFallback>RK</AvatarFallback>
+                <AvatarImage src={avatar || "/placeholder.svg"} alt="Profile picture" />
+                <AvatarFallback>
+                  {user?.username ? user?.username[0] : "U"}
+                </AvatarFallback>
               </Avatar>
               <Label htmlFor="avatar" className="cursor-pointer bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors">
                 Change Avatar
@@ -55,12 +60,12 @@ function ProfilePage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{user?.email}</Label>
               <Input id="email" type="email" value="rakesh@example.com" disabled />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{user?.username}</Label>
               <Input id="username" value="rakesh_k" disabled />
             </div>
 

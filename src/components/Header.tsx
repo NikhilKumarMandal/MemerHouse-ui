@@ -41,8 +41,8 @@ function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger className="focus-visible:outline-none">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder.svg" alt="User avatar" />
-                  <AvatarFallback>RK</AvatarFallback>
+                  <AvatarImage src={user?.avatar} alt="User avatar" />
+                  <AvatarFallback>{user?.username ? user?.username[0] : "U"} </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">

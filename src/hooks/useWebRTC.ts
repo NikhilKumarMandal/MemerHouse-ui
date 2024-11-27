@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useStateWithCallback } from "./useStateWithCallback";
-
+import {socketInit} from "../socket/index"
 interface Client {
     _id: string;
     username: string;
@@ -15,9 +15,15 @@ export interface User {
 
 export const useWebRTC = (roomId: string, user: User) => {
   const [clients, setClients] = useStateWithCallback<Client[]>([]);
-
   const audioElements = useRef<Record<string, HTMLAudioElement | null>>({});
   const localMediaStream = useRef<MediaStream | null>(null);
+  const socket = useRef<ReturnType<typeof socketInit> | null>(null);
+  console.log('Socket',socket);
+  
+
+  useEffect(() => {
+    socket.current = socketInit();
+  }, []);
 
   const provideRef = (instance: HTMLAudioElement | null, userId: string) => {
     audioElements.current[userId] = instance;
@@ -43,14 +49,14 @@ export const useWebRTC = (roomId: string, user: User) => {
           audio: true,
         });
 
-        // Add the local user as a client
         addNewClients({ _id: user._id, username: user.username }, () => {
           const localElement = audioElements.current[user._id];
 
           if (localElement && localMediaStream.current) {
-            localElement.volume = 0; // Mute local audio
+            localElement.volume = 0;
             localElement.srcObject = localMediaStream.current;
-          }
+          }      
+          socket.current?.emit('join',{})
         });
       } catch (error) {
         console.error("Error capturing media:", error);
@@ -58,7 +64,13 @@ export const useWebRTC = (roomId: string, user: User) => {
     };
 
     startCapture();
-  }, [addNewClients, user]);
+
+    return () => {
+      if (localMediaStream.current) {
+        localMediaStream.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [addNewClients, user, roomId]);
 
   return { clients, provideRef };
 };

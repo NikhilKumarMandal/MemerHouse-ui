@@ -1,5 +1,4 @@
 import CreateRoomModal from "@/components/create-room-modal"
-import Header from "@/components/Header"
 import RoomGrid from "@/components/room-grid"
 import SearchBar from "@/components/search-bar"
 import { Mic } from "lucide-react"
@@ -13,7 +12,6 @@ function HomePage() {
   }
   return (
     <div className="min-h-screen bg-zinc-950">
-      <Header />
       <main className="container mx-auto px-4 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <SearchBar />

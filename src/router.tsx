@@ -11,6 +11,7 @@ import Room from "./Pages/Room";
 
 
 
+
 export const router = createBrowserRouter([
     {
         path: "/",
@@ -21,8 +22,8 @@ export const router = createBrowserRouter([
         element: <Dhashboard />,
         children: [
         {
-            path: "",
-            element: <HomePage/>
+            path: "", 
+            element: <HomePage/>,
         },
         {
             path: "/profile", 

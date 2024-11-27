@@ -1,3 +1,4 @@
+import Header from "@/components/Header"
 import { useAuthStore } from "@/store"
 import { Navigate, Outlet } from "react-router-dom"
 
@@ -9,7 +10,8 @@ function Dhashboard() {
      }
   return (
     <div>
-        <Outlet />    
+      <Header/>
+      <Outlet />    
     </div>
   )
 }

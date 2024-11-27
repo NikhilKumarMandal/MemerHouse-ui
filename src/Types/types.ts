@@ -10,3 +10,11 @@ export interface Room {
     roomType: string,
     owner?: string
 }
+
+
+export interface CredentialType {
+    clientId: string,
+    credential: string,
+    select_by: string
+}
+

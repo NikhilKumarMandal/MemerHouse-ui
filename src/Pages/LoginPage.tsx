@@ -13,10 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Credentials } from "@/Types/types";
-import { login, self } from "@/http/api";
+import { Credentials, CredentialType } from "@/Types/types";
+import { googleOAuth, login, self } from "@/http/api";
 import { toast } from "sonner"
 import { useAuthStore } from "@/store";
+import { GoogleLogin } from '@react-oauth/google'
+import { useCallback } from "react";
 
 
 // Define the validation schema using Zod
@@ -39,6 +41,12 @@ const getSelf = async () => {
   const { data } = await self();
   return data
 }
+
+const googleAuth = async (token: string) => {
+  const { data } = await googleOAuth(token);
+  return data 
+}
+
 
 export default function LoginPage() {
   const { setUser } = useAuthStore()
@@ -81,6 +89,32 @@ export default function LoginPage() {
     
     mutate(data);
   };
+
+  const handleGoogleLoginSuccess = (credentialResponse: any) => {
+    const googleToken = credentialResponse.credential;
+    if (!googleToken) {
+      return toast.error("Google token not found!");
+    }
+
+    googleLogin(googleToken); // Trigger the mutation
+  };
+
+  const { mutate: googleLogin } = useMutation({
+    mutationKey: ['googleauth'],
+    mutationFn: googleAuth,
+    onSuccess: async () => {
+      const selfDataPromise = await refetch(); 
+      setUser(selfDataPromise.data)
+      toast("Logged In successfully")
+      navigate("/")
+    },
+    onError: (error: any) => {
+      const errorMessage =
+        error?.response?.data?.message || "Google login failed. Please try again.";
+      toast.error(errorMessage);
+    },
+  });
+
 
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
@@ -147,9 +181,16 @@ export default function LoginPage() {
             </Button>
 
             {/* Google Login Button */}
-            <Button variant="outline" className="w-full">
-              Login with Google
-            </Button>
+      
+        <GoogleLogin
+            size="large"
+            width="24rem"
+            theme="filled_black"
+            text="continue_with"
+            onSuccess={handleGoogleLoginSuccess}
+            onError={() => toast.error("Google Login failed!")}
+        />
+
           </form>
 
           {/* Sign-up Link */}
