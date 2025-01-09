@@ -34,7 +34,7 @@ function Header() {
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <span className="text-2xl">🤡</span>
-            <span className="text-xl font-semibold text-white">Memerhouse</span>
+            <span className="text-xl font-semibold text-white"></span>
           </Link>
           <div className="flex items-center gap-4">
             <span className="text-sm text-zinc-400">{ user?.username }</span>

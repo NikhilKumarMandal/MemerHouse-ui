@@ -7,7 +7,7 @@ export const self = () => api.get("/users/current-user");
 
 export const register = (credentials: Credentials) => api.post("/users/register", credentials)
 
-export const googleOAuth = (token: string) => api.post("/users/google",{token})
+export const googleOAuth = (token: string) => api.post("/auth/google",{token})
 
 export const logout = () => api.post("/users/logout")
 

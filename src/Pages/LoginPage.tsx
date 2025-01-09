@@ -13,12 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Credentials, CredentialType } from "@/Types/types";
+import { Credentials } from "@/Types/types";
 import { googleOAuth, login, self } from "@/http/api";
 import { toast } from "sonner"
 import { useAuthStore } from "@/store";
 import { GoogleLogin } from '@react-oauth/google'
-import { useCallback } from "react";
+
 
 
 // Define the validation schema using Zod
