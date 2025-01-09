@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/store";
 import axios from "axios";
+console.log("Hello");
 
 
 export const api = axios.create({
